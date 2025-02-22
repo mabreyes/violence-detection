@@ -28,6 +28,6 @@ repos:
     hooks:
       - id: nbqa-ruff
         additional_dependencies: [ruff==0.2.1]
-        args: ["--fix"]
+        args: ["--select", "F401,I", "--fix", "--exit-non-zero-on-fix"]
       - id: nbqa-ruff-format
         additional_dependencies: [ruff==0.2.1]
