@@ -1,12 +1,12 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.1
+    rev: v0.9.7
     hooks:
       - id: ruff
         args: ["check", "--select", "F401,I", "--fix", "--exit-non-zero-on-fix"]
       - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -23,3 +23,11 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
       - id: debug-statements
+  - repo: https://github.com/nbQA-dev/nbQA
+    rev: 1.9.1
+    hooks:
+      - id: nbqa-ruff
+        additional_dependencies: [ruff==0.2.1]
+        args: ["check", "--select", "F401,I", "--fix", "--exit-non-zero-on-fix"]
+      - id: nbqa-ruff-format
+        additional_dependencies: [ruff==0.2.1]
