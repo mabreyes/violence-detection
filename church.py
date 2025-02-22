@@ -150,7 +150,9 @@ def main():
         print(f"\n{n1} + {n2}:")
         print(f"Church representation: {result}")
         print(f"Decimal value: {result.count('|')}")
-        print(f"Lambda calculus: λf.λx.f^{result.count('|')}(x)")
+        # Expand lambda calculus notation to show repeated function application
+        f_applications = "f(" * result.count("|") + "x" + ")" * result.count("|")
+        print(f"Lambda calculus: λf.λx.{f_applications}")
 
 
 if __name__ == "__main__":
