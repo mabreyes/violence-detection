@@ -1,7 +1,50 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "violence-detection"
+name = "violence_detection"
 version = "0.1.0"
-description = "Add your description here"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+description = "Violence Detection System for Philippine Context with Limited Compute Resources"
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = []
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "torch>=1.8.0",
+    "torchvision>=0.9.0",
+    "opencv-python>=4.5.1",
+    "numpy>=1.19.5",
+    "pandas>=1.2.3",
+    "scikit-learn>=0.24.1",
+    "matplotlib>=3.3.4",
+    "seaborn>=0.11.1",
+    "tqdm>=4.59.0",
+    "onnx>=1.9.0",
+    "onnxruntime>=1.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "isort>=5.10.0",
+    "ruff>=0.0.200",
+]
+
+[tool.setuptools]
+packages = ["violence_detection"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py37"
+exclude = ["check", ".git", "__pycache__", "build", "dist"]
+
+[project.scripts]
+violence-detection = "violence_detection.cli:main"

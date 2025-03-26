@@ -3,7 +3,7 @@ repos:
     rev: v0.9.7
     hooks:
       - id: ruff
-        args: ["check", "--select", "F401,I", "--fix", "--exit-non-zero-on-fix"]
+        args: ["check", "--select", "E,F,W,I,N,B,D,S,C90,UP", "--fix", "--exit-non-zero-on-fix"]
       - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -27,7 +27,7 @@ repos:
     rev: 1.9.1
     hooks:
       - id: nbqa-ruff
-        additional_dependencies: [ruff==0.2.1]
-        args: ["--select", "F401,I", "--fix", "--exit-non-zero-on-fix"]
+        additional_dependencies: [ruff==0.9.7]
+        args: ["--select=E,F,W,I,N,B,D,S,C90,UP", "--fix", "--exit-non-zero-on-fix"]
       - id: nbqa-ruff-format
-        additional_dependencies: [ruff==0.2.1]
+        additional_dependencies: [ruff==0.9.7]

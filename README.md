@@ -1,81 +1,75 @@
-# Violence Detection - Deep Learning Thesis Project
+# Violence Detection System for Philippine Context
 
-## Overview
-This is an exploratory project focused on violence detection using deep learning techniques, developed as part of Marc Reyes' thesis research. The project investigates automated methods for identifying violent content in multimedia using state-of-the-art deep learning architectures.
-
-## Project Description
-This project aims to develop and evaluate deep learning models for detecting violent content in media, contributing to content moderation and safety applications. The research explores various neural network architectures, feature extraction techniques, and optimization methods to achieve robust violence detection.
-
-## Technical Details
-### Deep Learning Framework
-- Implementation using popular deep learning frameworks
-- CNN-based architectures for visual feature extraction
-- Temporal modeling for video analysis
-- Multi-modal fusion techniques
-
-### Data Processing
-- Video frame extraction and preprocessing
-- Real-time analysis capabilities
-- Batch processing support
-- Data augmentation techniques
-
-### Model Architecture
-- Convolutional Neural Networks (CNN)
-- Recurrent Neural Networks (RNN)
-- Attention mechanisms
-- Transfer learning implementation
+A complete system for detecting violence in videos using 4D CNN + LSTM + Transformer architecture, specifically optimized for limited computational resources in the Philippine context.
 
 ## Features
-- Real-time violence detection in video streams
-- Frame-by-frame analysis capabilities
-- Configurable detection thresholds
-- Performance metrics and evaluation tools
-- Visualization of detection results
-- Export capabilities for analysis
 
-## Getting Started
-1. Clone the repository
-2. Install required dependencies
-3. Configure environment variables
-4. Run `python hello.py` to verify setup
-5. Follow documentation for model training
+- **Efficient Architecture**: 4D CNN + LSTM + Transformer designed for limited compute resources
+- **Philippine Context Optimization**: Model parameters and data processing tuned for local context
+- **Complete Pipeline**: Data preprocessing, training, inference and evaluation tools included
+- **Mobile Deployment Support**: Optimized model variant for mobile applications
+- **Visualization Tools**: Advanced visualization of violence detection results
 
-## Development Roadmap
-- [x] Initial project setup
-- [x] Basic framework implementation
-- [ ] Data collection and preprocessing
-- [ ] Model architecture design
-- [ ] Training pipeline development
-- [ ] Evaluation metrics implementation
-- [ ] Performance optimization
-- [ ] Documentation and deployment
+## Requirements
 
-## Research Goals
-- Develop efficient violence detection algorithms
-- Improve detection accuracy and reduce false positives
-- Minimize computational requirements
-- Create deployable solutions for real-world applications
+- Python 3.7+
+- PyTorch 1.8+
+- OpenCV
+- scikit-learn
+- pandas
+- numpy
+- matplotlib
+- tqdm
 
-## Project Status
-This is an ongoing research project with regular updates and improvements. Progress and findings will be documented in this repository.
+## Installation
 
-## Contributing
-Contributions are welcome! Please read the contributing guidelines before submitting pull requests.
+### Option 1: Using UV (Recommended)
 
-## Author
-Marc Reyes
-- Research Lead
-- Thesis Developer
-- Algorithm Designer
+[UV](https://github.com/astral-sh/uv) is a much faster alternative to pip, built in Rust by Astral.
 
-## License
-[License details to be added]
+1. Install UV:
 
-## Acknowledgments
-- Academic advisors
-- Research contributors
-- Open source community
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-## Contact
-For research-related inquiries or collaboration opportunities, please reach out through appropriate channels.
+2. Clone the repository:
 
+```bash
+git clone https://github.com/yourusername/philippine-violence-detection.git
+cd philippine-violence-detection
+```
+
+3. Create a virtual environment and install dependencies with UV:
+
+```bash
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install -e ".[dev]"  # Install with development dependencies
+```
+
+### Option 2: Using pip
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/philippine-violence-detection.git
+cd philippine-violence-detection
+```
+
+2. Create a virtual environment (recommended):
+
+```bash
+python -m venv venv
+source venv/bin/activate   # On Windows: venv\Scripts\activate
+```
+
+3. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Dataset Preparation
+
+The system works with video data organized as follows:
