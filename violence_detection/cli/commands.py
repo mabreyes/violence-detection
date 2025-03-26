@@ -423,3 +423,81 @@ def evaluate_command(args: Any) -> None:
         json.dump(output_dict, f, indent=4)
 
     logger.info(f"Evaluation complete! Results saved to {args.output_dir}")
+
+
+def download_vid_command(args: Any) -> None:
+    """Download and prepare the Harvard VID dataset for violence detection.
+
+    Args:
+        args: Command-line arguments
+
+    """
+    from violence_detection.cli.preprocessing import process_dataset
+    from violence_detection.data.vid_dataset import (
+        create_vid_annotations,
+        create_vid_dataloaders,
+        download_vid_dataset,
+    )
+
+    logger.info("Downloading Harvard VID dataset...")
+
+    # Download the dataset
+    dataset_dir = download_vid_dataset(
+        output_dir=args.output_dir,
+        face_type=args.face_type,
+        subset=args.subset,
+        limit_files=args.limit_files,
+    )
+
+    # Create annotations file
+    annotations_file = os.path.join(args.output_dir, "vid_annotations.csv")
+    create_vid_annotations(dataset_dir, annotations_file)
+
+    logger.info(f"VID Dataset ready at {dataset_dir}")
+    logger.info(f"Annotations file: {annotations_file}")
+
+    # Process the dataset if requested
+    if args.process:
+        logger.info("Processing dataset for training...")
+        train_df, val_df = process_dataset(
+            video_dir=dataset_dir,
+            output_dir=os.path.join(args.output_dir, "processed"),
+            annotations=annotations_file,
+            test_size=args.test_size,
+            frame_rate=args.frame_rate,
+            max_frames_per_video=args.max_frames,
+            resize=(args.width, args.height),
+            random_seed=args.seed,
+        )
+
+        # Create dataloaders if requested (for testing purposes)
+        if args.create_dataloaders:
+            logger.info("Creating dataloaders for testing...")
+            train_loader, val_loader = create_vid_dataloaders(
+                dataset_dir=dataset_dir,
+                train_annotations=os.path.join(args.output_dir, "processed", "train_labels.csv"),
+                val_annotations=os.path.join(args.output_dir, "processed", "val_labels.csv"),
+                batch_size=args.batch_size if hasattr(args, "batch_size") else 8,
+                clip_length=args.clip_length if hasattr(args, "clip_length") else 16,
+                frame_stride=args.frame_stride if hasattr(args, "frame_stride") else 2,
+                num_workers=args.num_workers if hasattr(args, "num_workers") else 4,
+                spatial_size=(args.width, args.height),
+            )
+
+            # Print dataset info
+            logger.info(
+                f"Created dataloaders with {len(train_loader.dataset)} training and "
+                f"{len(val_loader.dataset)} validation samples"
+            )
+
+            # Test a batch to make sure everything works
+            if args.test_batch:
+                try:
+                    logger.info("Testing a batch...")
+                    for clips, labels in train_loader:
+                        logger.info(f"Loaded batch: {clips.shape}, labels: {labels.shape}")
+                        break
+                except Exception as e:
+                    logger.error(f"Error loading batch: {str(e)}")
+
+        logger.info("Dataset processed and ready for training!")

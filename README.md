@@ -73,3 +73,23 @@ pip install -r requirements.txt
 ## Dataset Preparation
 
 The system works with video data organized as follows:
+
+## Datasets
+
+### Philippine Violence Detection Dataset
+
+The system is optimized for Philippine contexts and can be trained on your local dataset. The dataset structure should be organized with videos in separate folders for violent and non-violent content.
+
+### Harvard VID Dataset
+
+The system can also use the Violence in Videos (VID) dataset from Harvard Dataverse, which contains 3,000 video clips with equal representation of violent and non-violent scenarios:
+
+```bash
+# Download the VID dataset
+violence-detection download-vid --output-dir ./data/vid
+
+# Download and process in one step
+violence-detection download-vid --output-dir ./data/vid --process
+```
+
+For more details, see the [Data Module README](violence_detection/data/README.md).

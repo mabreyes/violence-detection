@@ -4,7 +4,13 @@ import argparse
 import logging
 from typing import Optional
 
-from .commands import evaluate_command, infer_command, preprocess_command, train_command
+from .commands import (
+    download_vid_command,
+    evaluate_command,
+    infer_command,
+    preprocess_command,
+    train_command,
+)
 
 
 def setup_logging() -> None:
@@ -169,6 +175,77 @@ def create_parser() -> argparse.ArgumentParser:
     )
     eval_parser.add_argument("--mobile", action="store_true", help="Use mobile-optimized model")
 
+    # Download-vid command
+    download_vid_parser = subparsers.add_parser(
+        "download-vid", help="Download and prepare the Harvard VID dataset for violence detection"
+    )
+    download_vid_parser.add_argument(
+        "--output-dir", type=str, default="./data", help="Directory to save the dataset"
+    )
+    download_vid_parser.add_argument(
+        "--face-type",
+        type=str,
+        choices=["blurred", "masked"],
+        default="blurred",
+        help="Type of face anonymization to use",
+    )
+    download_vid_parser.add_argument(
+        "--subset",
+        type=str,
+        choices=["violent", "non_violent"],
+        default=None,
+        help="Optional subset to download (download both if not specified)",
+    )
+    download_vid_parser.add_argument(
+        "--limit-files",
+        type=int,
+        default=None,
+        help="Limit number of RAR files to download per category",
+    )
+    download_vid_parser.add_argument(
+        "--process", action="store_true", help="Process the dataset for training after downloading"
+    )
+    # Processing parameters (only used if --process is specified)
+    download_vid_parser.add_argument(
+        "--test-size", type=float, default=0.2, help="Fraction of data to use for validation"
+    )
+    download_vid_parser.add_argument(
+        "--frame-rate", type=int, default=5, help="Number of frames per second to extract"
+    )
+    download_vid_parser.add_argument(
+        "--max-frames",
+        type=int,
+        default=300,
+        help="Maximum number of frames to extract from each video",
+    )
+    download_vid_parser.add_argument(
+        "--width", type=int, default=224, help="Width to resize frames to"
+    )
+    download_vid_parser.add_argument(
+        "--height", type=int, default=224, help="Height to resize frames to"
+    )
+    download_vid_parser.add_argument(
+        "--seed", type=int, default=42, help="Random seed for train/val split"
+    )
+    # Testing options
+    download_vid_parser.add_argument(
+        "--create-dataloaders",
+        action="store_true",
+        help="Create dataloaders after processing (for testing)",
+    )
+    download_vid_parser.add_argument(
+        "--test-batch",
+        action="store_true",
+        help="Test loading a batch (requires --create-dataloaders)",
+    )
+    download_vid_parser.add_argument(
+        "--batch-size", type=int, default=8, help="Batch size for testing dataloaders"
+    )
+    download_vid_parser.add_argument(
+        "--num-workers", type=int, default=4, help="Number of workers for testing dataloaders"
+    )
+    download_vid_parser.set_defaults(func=download_vid_command)
+
     return parser
 
 
@@ -199,6 +276,8 @@ def main(args: Optional[argparse.Namespace] = None) -> None:
         infer_command(args)
     elif args.command == "evaluate":
         evaluate_command(args)
+    elif args.command == "download-vid":
+        download_vid_command(args)
     else:
         parser.print_help()
 
