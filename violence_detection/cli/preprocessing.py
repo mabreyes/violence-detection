@@ -194,7 +194,9 @@ def process_videos(
         label = labels.get(video_id, None) if labels else None
 
         # Store video data
-        video_data.append({"video_id": video_id, "num_frames": num_frames, "label": label})
+        video_data.append(
+            {"video_id": video_id, "num_frames": num_frames, "label": label}
+        )
 
     return pd.DataFrame(video_data)
 
@@ -236,7 +238,7 @@ def process_dataset(
     Args:
         video_dir: Directory containing video files
         output_dir: Directory to save extracted frames and labels
-        annotations: Path to annotations file (CSV with video_id,label,path columns)
+        annotations: Path to annotations file (CSV with video_id,label columns)
         test_size: Fraction of data to use for validation
         frame_rate: Number of frames per second to extract
         max_frames_per_video: Maximum number of frames to extract from each video
@@ -252,100 +254,19 @@ def process_dataset(
     frames_dir = os.path.join(output_dir, "frames")
     os.makedirs(frames_dir, exist_ok=True)
 
-    if annotations:
-        # Use annotations with path column for more complex structures
-        df = pd.read_csv(annotations)
-        print(f"Loaded {len(df)} annotations")
-        
-        # Check if path column exists
-        use_path = "path" in df.columns
-        
-        # Process videos using the annotations directly
-        video_data = []
-        
-        for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing videos"):
-            video_id = row['video_id']
-            label = row['label']
-            
-            # Get the video path - either directly from the path column or by building it
-            if use_path:
-                video_path = os.path.join(video_dir, row['path'])
-            else:
-                video_path = os.path.join(video_dir, video_id)
-            
-            # Skip if video doesn't exist
-            if not os.path.exists(video_path):
-                print(f"Warning: Video file not found: {video_path}")
-                continue
-            
-            # Create directory for this video's frames
-            video_frames_dir = os.path.join(frames_dir, video_id.replace(".", "_"))
-            os.makedirs(video_frames_dir, exist_ok=True)
-            
-            # Extract frames
-            num_frames, _ = extract_frames(
-                video_path=video_path,
-                output_dir=video_frames_dir,
-                frame_rate=frame_rate,
-                max_frames=max_frames_per_video,
-                resize=resize,
-            )
-            
-            # Store video data
-            video_data.append({"video_id": video_id, "num_frames": num_frames, "label": label})
-        
-        # Convert to DataFrame
-        new_df = pd.DataFrame(video_data)
-        
-        # Make sure we found and processed at least some videos
-        if len(new_df) == 0:
-            raise ValueError("No videos were processed. Check video paths and annotations.")
-        
-        # Use the new dataframe with processed videos
-        df = new_df
-    else:
-        # Find all video files and load annotations
-        video_files = find_video_files(video_dir)
-        print(f"Found {len(video_files)} video files")
-        
-        if annotations and os.path.exists(annotations):
-            video_files, labels = load_annotations(annotations, video_files)
-            print(f"After filtering, using {len(video_files)} videos")
-        else:
-            labels = None
-            
-        # Process videos
-        video_data = []
-        
-        for video_path in tqdm(video_files, desc="Processing videos"):
-            video_id = os.path.basename(video_path)
-            
-            # Create directory for this video's frames
-            video_frames_dir = os.path.join(frames_dir, video_id.replace(".", "_"))
-            os.makedirs(video_frames_dir, exist_ok=True)
-            
-            # Extract frames
-            num_frames, _ = extract_frames(
-                video_path=video_path,
-                output_dir=video_frames_dir,
-                frame_rate=frame_rate,
-                max_frames=max_frames_per_video,
-                resize=resize,
-            )
-            
-            # Get label if available
-            label = labels.get(video_id, None) if labels else None
-            
-            # Store video data
-            video_data.append({"video_id": video_id, "num_frames": num_frames, "label": label})
-        
-        # Convert to DataFrame
-        df = pd.DataFrame(video_data)
-        
-        # If labels were not provided but we need them for training
-        if labels is None:
-            print("No annotations provided. Using directory structure for labels.")
-            df = infer_labels_from_dirs(df, video_dir)
+    # Find all video files and load annotations
+    video_files = find_video_files(video_dir)
+    video_files, labels = load_annotations(annotations, video_files)
+
+    # Process videos and extract frames
+    df = process_videos(
+        video_files, frames_dir, labels, frame_rate, max_frames_per_video, resize
+    )
+
+    # If labels were not provided but we need them for training
+    if labels is None:
+        print("No annotations provided. Using directory structure for labels.")
+        df = infer_labels_from_dirs(df, video_dir)
 
     # Check if we have labels
     if "label" not in df.columns or df["label"].isna().any():
@@ -370,7 +291,9 @@ def process_dataset(
     return train_df, val_df
 
 
-def analyze_dataset(train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: str) -> None:
+def analyze_dataset(
+    train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: str
+) -> None:
     """Analyze the dataset and save statistics.
 
     Args:
@@ -390,7 +313,9 @@ def analyze_dataset(train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: st
     class_counts.columns = ["non-violent", "violent"]
 
     # Get frame count statistics
-    frame_stats = df.groupby("split")["num_frames"].agg(["min", "max", "mean", "median", "std"])
+    frame_stats = df.groupby("split")["num_frames"].agg(
+        ["min", "max", "mean", "median", "std"]
+    )
 
     # Save statistics
     with open(os.path.join(output_dir, "dataset_analysis.txt"), "w") as f:
@@ -402,7 +327,9 @@ def analyze_dataset(train_df: pd.DataFrame, val_df: pd.DataFrame, output_dir: st
 
         f.write("=== Overall Dataset ===\n")
         f.write(f"Total videos: {len(df)}\n")
-        f.write(f"Violent videos: {df['label'].sum()} ({df['label'].mean() * 100:.2f}%)\n")
+        f.write(
+            f"Violent videos: {df['label'].sum()} ({df['label'].mean() * 100:.2f}%)\n"
+        )
         f.write(f"Non-violent videos: {len(df) - df['label'].sum()}\n")
         f.write(f"Total frames: {df['num_frames'].sum()}\n")
         f.write(f"Average frames per video: {df['num_frames'].mean():.2f}\n")

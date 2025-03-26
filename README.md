@@ -82,14 +82,14 @@ The system is optimized for Philippine contexts and can be trained on your local
 
 ### Harvard VID Dataset
 
-The system can also use the Violence in Videos (VID) dataset from Harvard Dataverse. Currently, only the non-violent videos are accessible:
+The system can also use the Violence in Videos (VID) dataset from Harvard Dataverse, which contains 3,000 video clips with equal representation of violent and non-violent scenarios:
 
 ```bash
-# Download the non-violent videos from VID dataset
-violence-detection download-vid --output-dir ./data/vid --non-violent-only
+# Download the VID dataset
+violence-detection download-vid --output-dir ./data/vid
 
 # Download and process in one step
-violence-detection download-vid --output-dir ./data/vid --non-violent-only --process
+violence-detection download-vid --output-dir ./data/vid --process
 ```
 
 For more details, see the [Data Module README](violence_detection/data/README.md).

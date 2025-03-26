@@ -98,7 +98,9 @@ def train_command(args: Any) -> None:
     # Count model parameters
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    logger.info(f"Model has {total_params:,} parameters, {trainable_params:,} trainable")
+    logger.info(
+        f"Model has {total_params:,} parameters, {trainable_params:,} trainable"
+    )
 
     # Define loss function
     if args.focal_loss:
@@ -109,13 +111,17 @@ def train_command(args: Any) -> None:
         logger.info("Using Cross Entropy Loss")
 
     # Define optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    optimizer = torch.optim.AdamW(
+        model.parameters(), lr=args.lr, weight_decay=args.weight_decay
+    )
 
     # Define learning rate scheduler
     if args.scheduler == "step":
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
     elif args.scheduler == "cosine":
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=args.num_epochs)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=args.num_epochs
+        )
     elif args.scheduler == "plateau":
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode="max", factor=0.1, patience=5, verbose=True
@@ -223,7 +229,8 @@ def infer_command(args: Any) -> None:
     # Save overall results
     output = {
         "results": [
-            {"video": r["video"], "score": r["score"], "class": r["class"]} for r in results
+            {"video": r["video"], "score": r["score"], "class": r["class"]}
+            for r in results
         ],
         "metadata": {
             "threshold": args.threshold,
@@ -325,7 +332,9 @@ def evaluate_command(args: Any) -> None:
     prec = precision_score(all_labels, all_preds, average="macro", zero_division=0)
     rec = recall_score(all_labels, all_preds, average="macro", zero_division=0)
     f1 = f1_score(all_labels, all_preds, average="macro", zero_division=0)
-    auc = roc_auc_score(all_labels, all_scores) if len(np.unique(all_labels)) > 1 else 0.0
+    auc = (
+        roc_auc_score(all_labels, all_scores) if len(np.unique(all_labels)) > 1 else 0.0
+    )
     cm = confusion_matrix(all_labels, all_preds)
 
     # Print metrics
@@ -381,13 +390,17 @@ def evaluate_command(args: Any) -> None:
             {
                 "score": all_scores,
                 "label": [
-                    "Violent" if label_val == 1 else "Non-violent" for label_val in all_labels
+                    "Violent" if label_val == 1 else "Non-violent"
+                    for label_val in all_labels
                 ],
             }
         )
         sns.histplot(data=scores_df, x="score", hue="label", bins=30, alpha=0.6)
         plt.axvline(
-            x=args.threshold, color="red", linestyle="--", label=f"Threshold ({args.threshold})"
+            x=args.threshold,
+            color="red",
+            linestyle="--",
+            label=f"Threshold ({args.threshold})",
         )
         plt.xlabel("Violence Score")
         plt.ylabel("Count")
@@ -430,16 +443,17 @@ def download_vid_command(args: Any) -> None:
 
     Args:
         args: Command-line arguments
+
     """
-    from violence_detection.data.vid_dataset import (
-        download_vid_dataset,
-        create_vid_annotations,
-        create_vid_dataloaders
-    )
     from violence_detection.cli.preprocessing import process_dataset
-    
+    from violence_detection.data.vid_dataset import (
+        create_vid_annotations,
+        create_vid_dataloaders,
+        download_vid_dataset,
+    )
+
     logger.info("Downloading Harvard VID dataset...")
-    
+
     # Download the dataset
     dataset_dir = download_vid_dataset(
         output_dir=args.output_dir,
@@ -447,6 +461,8 @@ def download_vid_command(args: Any) -> None:
         subset=args.subset,
         limit_files=args.limit_files,
         non_violent_only=args.non_violent_only
+        if hasattr(args, "non_violent_only")
+        else False,
     )
 
     # Create annotations file
@@ -475,8 +491,12 @@ def download_vid_command(args: Any) -> None:
             logger.info("Creating dataloaders for testing...")
             train_loader, val_loader = create_vid_dataloaders(
                 dataset_dir=dataset_dir,
-                train_annotations=os.path.join(args.output_dir, "processed", "train_labels.csv"),
-                val_annotations=os.path.join(args.output_dir, "processed", "val_labels.csv"),
+                train_annotations=os.path.join(
+                    args.output_dir, "processed", "train_labels.csv"
+                ),
+                val_annotations=os.path.join(
+                    args.output_dir, "processed", "val_labels.csv"
+                ),
                 batch_size=args.batch_size if hasattr(args, "batch_size") else 8,
                 clip_length=args.clip_length if hasattr(args, "clip_length") else 16,
                 frame_stride=args.frame_stride if hasattr(args, "frame_stride") else 2,
@@ -495,7 +515,9 @@ def download_vid_command(args: Any) -> None:
                 try:
                     logger.info("Testing a batch...")
                     for clips, labels in train_loader:
-                        logger.info(f"Loaded batch: {clips.shape}, labels: {labels.shape}")
+                        logger.info(
+                            f"Loaded batch: {clips.shape}, labels: {labels.shape}"
+                        )
                         break
                 except Exception as e:
                     logger.error(f"Error loading batch: {str(e)}")
