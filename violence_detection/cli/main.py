@@ -203,6 +203,11 @@ def create_parser() -> argparse.ArgumentParser:
         help="Limit number of RAR files to download per category",
     )
     download_vid_parser.add_argument(
+        "--non-violent-only",
+        action="store_true",
+        help="Download only non-violent videos (for testing, as violent videos may not be accessible)",
+    )
+    download_vid_parser.add_argument(
         "--process", action="store_true", help="Process the dataset for training after downloading"
     )
     # Processing parameters (only used if --process is specified)

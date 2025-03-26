@@ -430,23 +430,23 @@ def download_vid_command(args: Any) -> None:
 
     Args:
         args: Command-line arguments
-
     """
-    from violence_detection.cli.preprocessing import process_dataset
     from violence_detection.data.vid_dataset import (
-        create_vid_annotations,
-        create_vid_dataloaders,
         download_vid_dataset,
+        create_vid_annotations,
+        create_vid_dataloaders
     )
-
+    from violence_detection.cli.preprocessing import process_dataset
+    
     logger.info("Downloading Harvard VID dataset...")
-
+    
     # Download the dataset
     dataset_dir = download_vid_dataset(
         output_dir=args.output_dir,
         face_type=args.face_type,
         subset=args.subset,
         limit_files=args.limit_files,
+        non_violent_only=args.non_violent_only
     )
 
     # Create annotations file
